@@ -14,7 +14,7 @@ provider "grafana" {
 
 # Grafana resources
 resource "grafana_folder" "aptible_generated" {
-  title = "Aptible Generated"
+  title = var.folder_title
 }
 
 resource "grafana_dashboard" "app_metrics" {

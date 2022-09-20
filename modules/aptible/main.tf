@@ -24,31 +24,33 @@ locals {
 }
 
 # Environments
-# The environment being drained
-data "aptible_environment" "drains" {
-  for_each = toset(local.drain_environments)
-
-  handle = each.value
-}
-
-# The environment that metrics are sent to
+# The Environment that metrics are sent to
 data "aptible_environment" "metrics" {
   handle = var.metrics_environment
 }
 
-# Databases
-# The influx database where metrics will be stored
-resource "aptible_database" "influx" {
-  handle        = "influx"
-  env_id        = data.aptible_environment.metrics.env_id
-  database_type = "influxdb"
+# The Environments being drained
+data "aptible_environment" "drains" {
+  for_each = local.drain_environments
+
+  handle = each.value
 }
 
-# The PG database where grafana's data will be stored
+# Databases
+# The InfluxDB database where metrics will be stored
+resource "aptible_database" "influx" {
+  handle         = var.influx_handle
+  env_id         = data.aptible_environment.metrics.env_id
+  database_type  = "influxdb"
+  container_size = var.influx_container_size
+}
+
+# The PostgreSQL database where Grafana's data will be stored
 resource "aptible_database" "postgres" {
-  handle        = "pg-grafana"
-  env_id        = data.aptible_environment.metrics.env_id
-  database_type = "postgresql"
+  handle         = var.postgres_handle
+  env_id         = data.aptible_environment.metrics.env_id
+  database_type  = "postgresql"
+  container_size = var.postgres_container_size
 }
 
 # Database URLs
@@ -127,15 +129,16 @@ resource "null_resource" "metric_drain" {
 
 # Apps
 resource "aptible_app" "grafana" {
-  handle = "grafana"
+  handle = var.grafana_handle
   env_id = data.aptible_environment.metrics.env_id
   service {
     process_type           = "cmd"
-    container_count        = 1
-    container_memory_limit = 1024
+    container_count        = var.grafana_container_count
+    container_memory_limit = var.grafana_container_size
   }
   config = {
     "APTIBLE_DOCKER_IMAGE"       = "grafana/grafana:${var.grafana_image_tag}"
+    "FORCE_SSL"                  = "true"
     "GF_SECURITY_ADMIN_PASSWORD" = random_password.gf_admin_password.result
     "GF_SECURITY_SECRET_KEY"     = random_password.gf_secret_key.result
     "GF_DEFAULT_INSTANCE_NAME"   = "aptible"
@@ -148,7 +151,6 @@ resource "aptible_app" "grafana" {
     "GF_DATABASE_USER"           = "${var.grafana_db_user}"
     "GF_DATABASE_PASSWORD"       = "${random_password.gf_db_password.result}"
     "GF_DATABASE_SSL_MODE"       = "require"
-    "FORCE_SSL"                  = "true"
   }
   depends_on = [null_resource.sessions_table]
 }

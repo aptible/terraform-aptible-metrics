@@ -1,4 +1,6 @@
 resource "grafana_rule_group" "aptible_generated" {
+  count = var.exclude_alerts ? 0 : 1
+
   name             = "Aptible Generated"
   folder_uid       = grafana_folder.aptible_generated.uid
   interval_seconds = 60
