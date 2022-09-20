@@ -1,14 +1,23 @@
-# Aptible Influx Grafana Terraform Module
+# Aptible Metrics Terraform Module
 
 This terraform module is designed to make it simple to manage "self-hosted"
 metrics collection and monitoring for Aptible Environments on Aptible. It
-includes two submodules to manage resources:
+includes two submodules for managing resources:
 
 ## `modules/aptible`
 
 This module is responsible for managing the Aptible resources (and the Grafana
-data source) necessary to collect and host metrics. This module likely won't be
+data source) necessary to collect and store metrics. This module likely won't be
 used directly unless Grafana dashboards are being managed elsewhere.
+
+### Dependencies
+
+- [Aptible CLI](https://deploy-docs.aptible.com/docs/cli)
+- [PostgreSQL CLI Client Tools](https://www.postgresql.org/download/)
+
+This module depends on the Aptible CLI in order to support managing metric
+drains. It also depends on the `psql` and`pg_isready` PostgreSQL client tools to
+configure the PostgreSQL Database for Grafana to use.
 
 ## `modules/grafana`
 
