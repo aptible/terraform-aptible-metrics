@@ -1,1 +1,1 @@
-modules/grafana/variables.tf
+modules/grafana/shared_variables.tf

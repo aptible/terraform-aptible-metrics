@@ -5,14 +5,14 @@ variable "url" {
 
 locals {
   parts = regex(
-    "^(?P<scheme>[^:]*)://(?:(?P<user>[^:]+)?(?::(?P<password>[^@]+))?@)?(?P<host>[^:/?#]+)(?::(?P<port>[^/?#]+))?(?:/(?P<database>[^?#]*))?(?:\\?(?P<query>[^#]*))?(?:#(?P<hash>.*))?$",
+    "^(?P<scheme>[^:]*)://(?:(?P<user>[^:]+)?(?::(?P<password>[^@]+))?@)?(?P<host>[^:/?#]+)(?::(?P<port>[^/?#]+))?(?:/(?P<database>[^?#]*))?(?:\\?(?P<query>[^#]*))?(?:#(?P<fragment>.*))?$",
     var.url
   )
 }
 
 output "scheme" {
-  value       = local.parts["scheme"]
   description = "The URL scheme excluding the trailing ://."
+  value       = local.parts["scheme"]
 }
 
 output "user" {
@@ -33,16 +33,16 @@ output "port" {
 }
 
 output "database" {
+  description = "The URL path without the leading / which corresponds to a database for most database types."
   value       = local.parts["database"]
-  description = "The URL path which corresponds to a database for most database types."
 }
 
 output "query" {
-  value       = local.parts["query"]
   description = "The URL query string excluding the leading ?."
+  value       = local.parts["query"]
 }
 
-output "hash" {
-  value       = local.parts["hash"]
-  description = "The URL hash string excluding the leading #."
+output "fragment" {
+  description = "The URL fragment string excluding the leading #."
+  value       = local.parts["fragment"]
 }

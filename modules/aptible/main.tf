@@ -20,7 +20,7 @@ terraform {
 }
 
 locals {
-  drain_environments = toset(var.drain_environments != null ? var.drain_environments : [var.metrics_env])
+  drain_environments = toset(var.drain_environments != null ? var.drain_environments : [var.metrics_environment])
 }
 
 # Environments
@@ -33,7 +33,7 @@ data "aptible_environment" "drains" {
 
 # The environment that metrics are sent to
 data "aptible_environment" "metrics" {
-  handle = var.metrics_env
+  handle = var.metrics_environment
 }
 
 # Databases
@@ -109,9 +109,9 @@ resource "null_resource" "metric_drain" {
   for_each = data.aptible_environment.drains
 
   triggers = {
-    env_id       = each.value.id
+    env_id       = each.value.env_id
     env_handle   = each.value.handle
-    drain_handle = "influx-drain"
+    drain_handle = "influx-${each.value.handle}"
     drain_url    = aptible_database.influx.default_connection_url
   }
 
@@ -186,44 +186,4 @@ resource "grafana_data_source" "influx" {
   secure_json_data_encoded = jsonencode({
     password = module.influx_url.password
   })
-}
-
-output "aptible_influx_database" {
-  value = aptible_database.influx
-}
-
-output "influx_database_name" {
-  value = local.influx_database_name
-}
-
-output "grafana_endpoint" {
-  value = aptible_endpoint.grafana_endpoint
-}
-
-output "grafana_url" {
-  value = local.grafana_url
-}
-
-output "grafana_auth" {
-  value     = local.grafana_auth
-  sensitive = true
-}
-
-output "grafana_db_user" {
-  value = var.grafana_db_user
-}
-
-output "grafana_db_password" {
-  value     = random_password.gf_db_password.result
-  sensitive = true
-}
-
-output "grafana_admin_password" {
-  value     = random_password.gf_admin_password.result
-  sensitive = true
-}
-
-output "grafana_data_source" {
-  value     = grafana_data_source.influx
-  sensitive = true
 }

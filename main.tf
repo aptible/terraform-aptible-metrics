@@ -1,7 +1,7 @@
 module "aptible" {
   source                  = "./modules/aptible"
   drain_environments      = var.drain_environments
-  metrics_env             = var.metrics_env
+  metrics_environment     = var.metrics_environment
   grafana_endpoint_domain = var.grafana_endpoint_domain
   grafana_db_user         = var.grafana_db_user
   grafana_image_tag       = var.grafana_image_tag
