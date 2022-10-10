@@ -1,12 +1,11 @@
 terraform {
   required_providers {
     aptible = {
-      source  = "aptible/aptible"
-      version = "0.3.1"
+      source = "aptible.com/aptible/aptible"
     }
     grafana = {
       source  = "grafana/grafana"
-      version = "1.28.2"
+      version = "1.29.0"
     }
     null = {
       source  = "hashicorp/null"
@@ -89,7 +88,7 @@ resource "random_password" "gf_secret_key" {
 # up the tunnel in order to reach the database
 resource "null_resource" "sessions_table" {
   triggers = {
-    env_id      = data.aptible_environment.metrics.id
+    env_id      = data.aptible_environment.metrics.env_id
     database_id = aptible_database.postgres.database_id
     user        = var.grafana_db_user
     password    = random_password.gf_db_password.result
@@ -104,33 +103,26 @@ resource "null_resource" "sessions_table" {
 # Create metric drain
 # The provider doesn't currently support this type of resource
 locals {
+  influx_database_url  = "${module.influx_url.scheme}://${module.influx_url.host}:${module.influx_url.port}"
   influx_database_name = module.influx_url.database != null ? module.influx_url.database : "db"
 }
 
-resource "null_resource" "metric_drain" {
+resource "aptible_metric_drain" "this" {
   for_each = data.aptible_environment.drains
 
-  triggers = {
-    env_id       = each.value.env_id
-    env_handle   = each.value.handle
-    drain_handle = "influx-${each.value.handle}"
-    drain_url    = aptible_database.influx.default_connection_url
-  }
-
-  provisioner "local-exec" {
-    command = "aptible metric_drain:create:influxdb:custom '${self.triggers.drain_handle}' --environment '${self.triggers.env_handle}' --username '${module.influx_url.user}' --password '${module.influx_url.password}' --url '${module.influx_url.scheme}://${module.influx_url.host}:${module.influx_url.port}' --db '${local.influx_database_name}'"
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = "aptible metric_drain:deprovision '${self.triggers.drain_handle}' --environment '${self.triggers.env_handle}'"
-  }
+  env_id     = each.value.env_id
+  handle     = "influx-${each.value.handle}"
+  drain_type = "influxdb"
+  url        = local.influx_database_url
+  username   = module.influx_url.user
+  password   = module.influx_url.password
+  database   = local.influx_database_name
 }
 
 # Apps
 resource "aptible_app" "grafana" {
-  handle = var.grafana_handle
   env_id = data.aptible_environment.metrics.env_id
+  handle = var.grafana_handle
   service {
     process_type           = "cmd"
     container_count        = var.grafana_container_count
@@ -182,7 +174,7 @@ provider "grafana" {
 resource "grafana_data_source" "influx" {
   name          = "aptible-influx"
   type          = "influxdb"
-  url           = "${module.influx_url.scheme}://${module.influx_url.host}:${module.influx_url.port}"
+  url           = local.influx_database_url
   database_name = local.influx_database_name
   username      = module.influx_url.user
   secure_json_data_encoded = jsonencode({

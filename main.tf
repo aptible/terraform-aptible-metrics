@@ -19,7 +19,7 @@ module "grafana" {
   grafana_url            = module.aptible.grafana_url
   grafana_auth           = module.aptible.grafana_auth
   influx_data_source_uid = module.aptible.grafana_data_source.uid
-  folder_title            = var.folder_title
+  folder_title           = var.folder_title
   alert_threshold        = var.alert_threshold
   alert_trigger_time     = var.alert_trigger_time
   exclude_alerts         = var.exclude_alerts
