@@ -41,9 +41,15 @@ variable "grafana_container_count" {
 }
 
 variable "grafana_container_size" {
-  description = "The container size (in MB) of the Grafana App containers."
+  description = "The size (in MB) of the Grafana App containers."
   type        = number
   default     = 1024
+}
+
+variable "grafana_container_profile" {
+  description = "The instance profile of the Grafana App containers."
+  type        = string
+  default     = "m4"
 }
 
 variable "influx_handle" {
@@ -53,9 +59,15 @@ variable "influx_handle" {
 }
 
 variable "influx_container_size" {
-  description = "The container size (in MB) of the InfluxDB metrics Database container."
+  description = "The size (in MB) of the InfluxDB metrics Database container."
   type        = number
   default     = 1024
+}
+
+variable "influx_container_profile" {
+  description = "The instance profile of the InfluxDB metrics Database container."
+  type        = string
+  default     = "m4"
 }
 
 variable "postgres_handle" {
@@ -65,7 +77,13 @@ variable "postgres_handle" {
 }
 
 variable "postgres_container_size" {
-  description = "The container size (in MB) of the PostgreSQL Grafana Database container."
+  description = "The size (in MB) of the PostgreSQL Grafana Database container."
   type        = number
   default     = 1024
+}
+
+variable "postgres_container_profile" {
+  description = "The instance profile of the PostgreSQL Grafana Database container."
+  type        = string
+  default     = "m4"
 }

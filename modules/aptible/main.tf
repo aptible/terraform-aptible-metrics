@@ -38,18 +38,20 @@ data "aptible_environment" "drains" {
 # Databases
 # The InfluxDB database where metrics will be stored
 resource "aptible_database" "influx" {
-  handle         = var.influx_handle
-  env_id         = data.aptible_environment.metrics.env_id
-  database_type  = "influxdb"
-  container_size = var.influx_container_size
+  handle            = var.influx_handle
+  env_id            = data.aptible_environment.metrics.env_id
+  database_type     = "influxdb"
+  container_size    = var.influx_container_size
+  container_profile = var.influx_container_profile
 }
 
 # The PostgreSQL database where Grafana's data will be stored
 resource "aptible_database" "postgres" {
-  handle         = var.postgres_handle
-  env_id         = data.aptible_environment.metrics.env_id
-  database_type  = "postgresql"
-  container_size = var.postgres_container_size
+  handle            = var.postgres_handle
+  env_id            = data.aptible_environment.metrics.env_id
+  database_type     = "postgresql"
+  container_size    = var.postgres_container_size
+  container_profile = var.postgres_container_profile
 }
 
 # Database URLs
@@ -85,10 +87,21 @@ resource "random_password" "gf_secret_key" {
 
 # Ensure PG database has necessary tables
 # Some providers exist to create database objects but we don't have a way to set
-# up the tunnel in order to reach the database
+# up the tunnel in order to reach the database so use an Aptible App
+resource "aptible_app" "psql" {
+  env_id = data.aptible_environment.metrics.env_id
+  handle = "psql-${data.aptible_environment.metrics.handle}"
+  service {
+    process_type    = "cmd"
+    container_count = 0
+  }
+  config = {
+    "APTIBLE_DOCKER_IMAGE" = "postgres"
+  }
+}
+
 resource "null_resource" "sessions_table" {
   triggers = {
-    env_id      = data.aptible_environment.metrics.env_id
     database_id = aptible_database.postgres.database_id
     user        = var.grafana_db_user
     password    = random_password.gf_db_password.result
@@ -96,8 +109,18 @@ resource "null_resource" "sessions_table" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "./pg_create_sessions.sh '${data.aptible_environment.metrics.handle}' '${aptible_database.postgres.handle}' '${aptible_database.postgres.default_connection_url}' '${self.triggers.user}' '${self.triggers.password}'"
-  }
+    command = <<-EOT
+    aptible ssh --environment ${data.aptible_environment.metrics.handle} --app ${aptible_app.psql.handle} bash -c "$(cat << EOF
+      psql '${aptible_database.postgres.default_connection_url}' << EOQ
+        ${templatefile("${path.module}/create_sessions.tftpl.sql", {
+    username = var.grafana_db_user
+    password = random_password.gf_db_password.result
+})}
+    EOQ
+    EOF
+    )"
+    EOT
+}
 }
 
 # Create metric drain
@@ -127,6 +150,7 @@ resource "aptible_app" "grafana" {
     process_type           = "cmd"
     container_count        = var.grafana_container_count
     container_memory_limit = var.grafana_container_size
+    container_profile      = var.grafana_container_profile
   }
   config = {
     "APTIBLE_DOCKER_IMAGE"       = "grafana/grafana:${var.grafana_image_tag}"
