@@ -12,12 +12,9 @@ used directly unless Grafana dashboards are being managed elsewhere.
 
 ### Dependencies
 
-- [Aptible CLI](https://deploy-docs.aptible.com/docs/cli)
-- [PostgreSQL CLI Client Tools](https://www.postgresql.org/download/)
-
-This module depends on the Aptible CLI in order to support managing metric
-drains. It also depends on the `psql` and`pg_isready` PostgreSQL client tools to
-configure the PostgreSQL Database for Grafana to use.
+This module depends on the 
+[Aptible CLI](https://deploy-docs.aptible.com/docs/cli) in order to set up the
+postgres Database to manage grafana sessions.
 
 ## `modules/grafana`
 

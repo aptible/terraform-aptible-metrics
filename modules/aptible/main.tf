@@ -96,7 +96,7 @@ resource "aptible_app" "psql" {
     container_count = 0
   }
   config = {
-    "APTIBLE_DOCKER_IMAGE" = "postgres"
+    "APTIBLE_DOCKER_IMAGE" = "postgres:alpine"
   }
 }
 
@@ -109,18 +109,26 @@ resource "null_resource" "sessions_table" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command = <<-EOT
-    aptible ssh --environment ${data.aptible_environment.metrics.handle} --app ${aptible_app.psql.handle} bash -c "$(cat << EOF
-      psql '${aptible_database.postgres.default_connection_url}' << EOQ
-        ${templatefile("${path.module}/create_sessions.tftpl.sql", {
-    username = var.grafana_db_user
-    password = random_password.gf_db_password.result
-})}
-    EOQ
-    EOF
-    )"
+    command     = <<-EOT
+      aptible ssh --environment ${data.aptible_environment.metrics.handle} --app ${aptible_app.psql.handle} sh -c "$(cat << EOF
+        psql '${aptible_database.postgres.default_connection_url}' << EOQ
+          CREATE DATABASE sessions;
+          \c sessions;
+
+          CREATE TABLE IF NOT EXISTS session (
+            key     CHAR(16) NOT NULL,
+            data    BYTEA,
+            expiry  INTEGER NOT NULL,
+            PRIMARY KEY (key)
+          );
+
+          CREATE USER "${var.grafana_db_user}" WITH PASSWORD '${random_password.gf_db_password.result}';
+          GRANT ALL PRIVILEGES ON DATABASE db, sessions to "${var.grafana_db_user}";
+      EOQ
+      EOF
+      )"
     EOT
-}
+  }
 }
 
 # Create metric drain
