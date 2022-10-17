@@ -2,19 +2,19 @@ terraform {
   required_providers {
     aptible = {
       source  = "aptible/aptible"
-      version = "0.3.1"
+      version = "~> 0.5.1"
     }
     grafana = {
       source  = "grafana/grafana"
-      version = "1.28.2"
+      version = "~> 1.29.0"
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.1.1"
+      version = "~> 3.1.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = "3.4.3"
+      version = "~> 3.4.0"
     }
   }
 }
@@ -39,18 +39,20 @@ data "aptible_environment" "drains" {
 # Databases
 # The InfluxDB database where metrics will be stored
 resource "aptible_database" "influx" {
-  handle         = var.influx_handle
-  env_id         = data.aptible_environment.metrics.env_id
-  database_type  = "influxdb"
-  container_size = var.influx_container_size
+  handle            = var.influx_handle
+  env_id            = data.aptible_environment.metrics.env_id
+  database_type     = "influxdb"
+  container_size    = var.influx_container_size
+  container_profile = var.influx_container_profile
 }
 
 # The PostgreSQL database where Grafana's data will be stored
 resource "aptible_database" "postgres" {
-  handle         = var.postgres_handle
-  env_id         = data.aptible_environment.metrics.env_id
-  database_type  = "postgresql"
-  container_size = var.postgres_container_size
+  handle            = var.postgres_handle
+  env_id            = data.aptible_environment.metrics.env_id
+  database_type     = "postgresql"
+  container_size    = var.postgres_container_size
+  container_profile = var.postgres_container_profile
 }
 
 # Database URLs
@@ -86,10 +88,21 @@ resource "random_password" "gf_secret_key" {
 
 # Ensure PG database has necessary tables
 # Some providers exist to create database objects but we don't have a way to set
-# up the tunnel in order to reach the database
+# up the tunnel in order to reach the database so use an Aptible App
+resource "aptible_app" "psql" {
+  env_id = data.aptible_environment.metrics.env_id
+  handle = "psql-${data.aptible_environment.metrics.handle}"
+  service {
+    process_type    = "cmd"
+    container_count = 0
+  }
+  config = {
+    "APTIBLE_DOCKER_IMAGE" = "postgres:alpine"
+  }
+}
+
 resource "null_resource" "sessions_table" {
   triggers = {
-    env_id      = data.aptible_environment.metrics.id
     database_id = aptible_database.postgres.database_id
     user        = var.grafana_db_user
     password    = random_password.gf_db_password.result
@@ -97,44 +110,56 @@ resource "null_resource" "sessions_table" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "./pg_create_sessions.sh '${data.aptible_environment.metrics.handle}' '${aptible_database.postgres.handle}' '${aptible_database.postgres.default_connection_url}' '${self.triggers.user}' '${self.triggers.password}'"
+    command     = <<-EOT
+      aptible ssh --environment ${data.aptible_environment.metrics.handle} --app ${aptible_app.psql.handle} sh -c "$(cat << EOF
+        psql '${aptible_database.postgres.default_connection_url}' << EOQ
+          CREATE DATABASE sessions;
+          \c sessions;
+
+          CREATE TABLE IF NOT EXISTS session (
+            key     CHAR(16) NOT NULL,
+            data    BYTEA,
+            expiry  INTEGER NOT NULL,
+            PRIMARY KEY (key)
+          );
+
+          CREATE USER "${var.grafana_db_user}" WITH PASSWORD '${random_password.gf_db_password.result}';
+          GRANT ALL PRIVILEGES ON DATABASE db, sessions to "${var.grafana_db_user}";
+      EOQ
+      EOF
+      )"
+    EOT
   }
 }
 
 # Create metric drain
 # The provider doesn't currently support this type of resource
 locals {
+  influx_database_url  = "${module.influx_url.scheme}://${module.influx_url.host}:${module.influx_url.port}"
   influx_database_name = module.influx_url.database != null ? module.influx_url.database : "db"
 }
 
-resource "null_resource" "metric_drain" {
+resource "aptible_metric_drain" "this" {
   for_each = data.aptible_environment.drains
 
-  triggers = {
-    env_id       = each.value.env_id
-    env_handle   = each.value.handle
-    drain_handle = "influx-${each.value.handle}"
-    drain_url    = aptible_database.influx.default_connection_url
-  }
-
-  provisioner "local-exec" {
-    command = "aptible metric_drain:create:influxdb:custom '${self.triggers.drain_handle}' --environment '${self.triggers.env_handle}' --username '${module.influx_url.user}' --password '${module.influx_url.password}' --url '${module.influx_url.scheme}://${module.influx_url.host}:${module.influx_url.port}' --db '${local.influx_database_name}'"
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = "aptible metric_drain:deprovision '${self.triggers.drain_handle}' --environment '${self.triggers.env_handle}'"
-  }
+  env_id     = each.value.env_id
+  handle     = "influx-${each.value.handle}"
+  drain_type = "influxdb"
+  url        = local.influx_database_url
+  username   = module.influx_url.user
+  password   = module.influx_url.password
+  database   = local.influx_database_name
 }
 
 # Apps
 resource "aptible_app" "grafana" {
-  handle = var.grafana_handle
   env_id = data.aptible_environment.metrics.env_id
+  handle = var.grafana_handle
   service {
     process_type           = "cmd"
     container_count        = var.grafana_container_count
     container_memory_limit = var.grafana_container_size
+    container_profile      = var.grafana_container_profile
   }
   config = {
     "APTIBLE_DOCKER_IMAGE"       = "grafana/grafana:${var.grafana_image_tag}"
@@ -182,7 +207,7 @@ provider "grafana" {
 resource "grafana_data_source" "influx" {
   name          = "aptible-influx"
   type          = "influxdb"
-  url           = "${module.influx_url.scheme}://${module.influx_url.host}:${module.influx_url.port}"
+  url           = local.influx_database_url
   database_name = local.influx_database_name
   username      = module.influx_url.user
   secure_json_data_encoded = jsonencode({
