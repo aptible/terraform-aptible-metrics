@@ -1,19 +1,20 @@
 terraform {
   required_providers {
     aptible = {
-      source = "aptible.com/aptible/aptible"
+      source = "aptible/aptible"
+      version = "~> 0.5.1"
     }
     grafana = {
       source  = "grafana/grafana"
-      version = "1.29.0"
+      version = "~> 1.29.0"
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.1.1"
+      version = "~> 3.1.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = "3.4.3"
+      version = "~> 3.4.0"
     }
   }
 }
