@@ -1,13 +1,6 @@
 # This file is maintained automatically by "terraform init".
 # Manual edits may be lost in future updates.
 
-provider "aptible.com/aptible/aptible" {
-  version = "0.0.0+local"
-  hashes = [
-    "h1:jVBxsyLKPiU0VmAYYtzgl6mIXu3/p+5HPq+yRPsujK4=",
-  ]
-}
-
 provider "registry.terraform.io/aptible/aptible" {
   version     = "0.5.1"
   constraints = "~> 0.5.1"
