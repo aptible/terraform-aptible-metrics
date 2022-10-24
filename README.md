@@ -7,19 +7,15 @@ includes two submodules for managing resources:
 ## `modules/aptible`
 
 This module is responsible for managing the Aptible resources (and the Grafana
-data source) necessary to collect and store metrics. This module likely won't be
-used directly unless Grafana dashboards are being managed elsewhere.
+data source) necessary to collect and store container metrics.
 
 ### Dependencies
 
 This module depends on the 
 [Aptible CLI](https://deploy-docs.aptible.com/docs/cli) in order to set up the
-postgres Database to manage grafana sessions.
+PostgreSQL Database to manage Grafana sessions.
 
 ## `modules/grafana`
 
 This module is responsible for managing the Grafana resources necessary to
-visualize and monitor the collected metrics. This module is useful on its own
-for applying the Grafana dashboards and alert rules to an existing Grafana
-instance. The module creates its own folder for the resources it manages so as
-to not interfere with other resources.
+visualize and monitor metrics collected by Aptible Metric Drains.
