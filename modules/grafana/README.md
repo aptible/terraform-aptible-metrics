@@ -50,3 +50,17 @@ No modules.
 |------|-------------|
 | <a name="output_grafana_folder"></a> [grafana\_folder](#output\_grafana\_folder) | The grafana\_folder that contains all of the module's resources. |
 <!-- END_TF_DOCS -->
+
+## Screenshots
+
+### App Metrics
+
+![App Dashboard](./screenshots/app-dashboard.png)
+
+### Database Metrics
+
+![Database Dashboard](./screenshots/database-dashboard.png)
+
+### Alerts
+
+![Alerts](./screenshots/alert-rules.png)

@@ -4,7 +4,7 @@ This terraform module is designed to make it simple to manage "self-hosted"
 metrics collection and monitoring for Aptible Environments on Aptible. It
 includes two submodules for managing resources:
 
-## [`modules/aptible`](./modules/grafana)
+## `aptible`
 
 This module is responsible for managing the Aptible resources (and the Grafana
 data source) necessary to collect and store container metrics.
@@ -15,7 +15,7 @@ This module depends on the
 [Aptible CLI](https://deploy-docs.aptible.com/docs/cli) in order to set up the
 PostgreSQL Database to manage Grafana sessions.
 
-## [`modules/grafana`](./modules/grafana)
+## `grafana`
 
 This module is responsible for managing the Grafana resources necessary to
 visualize and monitor metrics collected by Aptible Metric Drains.
@@ -71,3 +71,17 @@ No resources.
 | <a name="output_aptible"></a> [aptible](#output\_aptible) | All of the outputs from the aptible module. |
 | <a name="output_grafana"></a> [grafana](#output\_grafana) | All of the outputs from the grafana module. |
 <!-- END_TF_DOCS -->
+
+## Dashboard Screenshots
+
+### App Metrics
+
+![App Dashboard](./modules/grafana/screenshots/app-dashboard.png)
+
+### Database Metrics
+
+![Database Dashboard](./modules/grafana/screenshots/database-dashboard.png)
+
+### Alerts
+
+![Alerts](./modules/grafana/screenshots/alert-rules.png)
