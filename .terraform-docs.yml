@@ -1,0 +1,12 @@
+formatter: ""
+
+recursive:
+  enabled: true
+  path: modules
+
+output:
+  file: "README.md"
+
+sort:
+  enabled: true
+  by: required
