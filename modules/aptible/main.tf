@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aptible = {
       source  = "aptible/aptible"
-      version = "~> 0.5.1"
+      version = "~> 0.8.1"
     }
     grafana = {
       source  = "grafana/grafana"
