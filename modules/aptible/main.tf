@@ -113,6 +113,9 @@ resource "null_resource" "sessions_table" {
     command     = <<-EOT
       aptible ssh --environment ${data.aptible_environment.metrics.handle} --app ${aptible_app.psql.handle} sh -c "$(cat << EOF
         psql '${aptible_database.postgres.default_connection_url}' << EOQ
+          CREATE USER "${var.grafana_db_user}" WITH PASSWORD '${random_password.gf_db_password.result}';
+          GRANT ALL ON SCHEMA public TO "${var.grafana_db_user}";
+          
           CREATE DATABASE sessions;
           \c sessions;
 
@@ -123,8 +126,8 @@ resource "null_resource" "sessions_table" {
             PRIMARY KEY (key)
           );
 
-          CREATE USER "${var.grafana_db_user}" WITH PASSWORD '${random_password.gf_db_password.result}';
           GRANT ALL PRIVILEGES ON DATABASE db, sessions to "${var.grafana_db_user}";
+          GRANT ALL ON SCHEMA public TO "${var.grafana_db_user}";
       EOQ
       EOF
       )"
