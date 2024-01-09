@@ -96,17 +96,17 @@
       },
       "targets": [
         {
-          "alias": "$tag_environment - $tag_app - $tag_service - $tag_host",
+          "alias": "$tag_environment - $tag_app - $tag_service - $tag_host_name",
           "hide": false,
-          "query": "SELECT MAX(\"memory_rss_mb\")\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"environment\" =~ /^$environment$/\nAND \"app\" =~ /^$app$/\nAND \"service\" =~ /^$service$/\nAND \"host\" =~ /^$host$/\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host\"\n        fill(null)",
+          "query": "SELECT MAX(\"memory_rss_mb\")\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"environment\" =~ /^$environment$/\nAND \"app\" =~ /^$app$/\nAND \"service\" =~ /^$service$/\nAND \"host_name\" =~ /^$host$/\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host_name\"\n        fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
         },
         {
-          "alias": "$tag_environment - $tag_app - $tag_service - $tag_host (Limit)",
+          "alias": "$tag_environment - $tag_app - $tag_service - $tag_host_name (Limit)",
           "hide": false,
-          "query": "SELECT MAX(\"memory_limit_mb\")\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"environment\" =~ /^$environment$/\nAND \"app\" =~ /^$app$/\nAND \"service\" =~ /^$service$/\nAND \"host\" =~ /^$host$/\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host\"\n        fill(null)",
+          "query": "SELECT MAX(\"memory_limit_mb\")\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"environment\" =~ /^$environment$/\nAND \"app\" =~ /^$app$/\nAND \"service\" =~ /^$service$/\nAND \"host_name\" =~ /^$host$/\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host_name\"\n        fill(null)",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -184,9 +184,9 @@
       },
       "targets": [
         {
-          "alias": "$tag_environment - $tag_app - $tag_service - $tag_host",
+          "alias": "$tag_environment - $tag_app - $tag_service - $tag_host_name",
           "hide": false,
-          "query": "SELECT MAX(\"memory_rss_mb\") / MAX(\"memory_limit_mb\")\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"environment\" =~ /^$environment$/\nAND \"app\" =~ /^$app$/\nAND \"service\" =~ /^$service$/\nAND \"host\" =~ /^$host$/\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host\"\n        fill(null)",
+          "query": "SELECT MAX(\"memory_rss_mb\") / MAX(\"memory_limit_mb\")\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"environment\" =~ /^$environment$/\nAND \"app\" =~ /^$app$/\nAND \"service\" =~ /^$service$/\nAND \"host_name\" =~ /^$host$/\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host_name\"\n        fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -264,17 +264,17 @@
       },
       "targets": [
         {
-          "alias": "$tag_environment - $tag_app - $tag_service - $tag_host",
+          "alias": "$tag_environment - $tag_app - $tag_service - $tag_host_name",
           "hide": false,
-          "query": "SELECT MAX(\"milli_cpu_usage\") / 1000\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"environment\" =~ /^$environment$/\nAND \"app\" =~ /^$app$/\nAND \"service\" =~ /^$service$/\nAND \"host\" =~ /^$host$/\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host\"\n        fill(null)",
+          "query": "SELECT MAX(\"milli_cpu_usage\") / 1000\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"environment\" =~ /^$environment$/\nAND \"app\" =~ /^$app$/\nAND \"service\" =~ /^$service$/\nAND \"host_name\" =~ /^$host$/\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host_name\"\n        fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
         },
         {
-          "alias": "$tag_environment - $tag_app - $tag_service - $tag_host (Limit)",
+          "alias": "$tag_environment - $tag_app - $tag_service - $tag_host_name (Limit)",
           "hide": false,
-          "query": "SELECT MAX(\"memory_limit_mb\") / 4096\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"environment\" =~ /^$environment$/\nAND \"app\" =~ /^$app$/\nAND \"service\" =~ /^$service$/\nAND \"host\" =~ /^$host$/\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host\"\n        fill(null)",
+          "query": "SELECT MAX(\"memory_limit_mb\") / 4096\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"environment\" =~ /^$environment$/\nAND \"app\" =~ /^$app$/\nAND \"service\" =~ /^$service$/\nAND \"host_name\" =~ /^$host$/\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host_name\"\n        fill(null)",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -352,9 +352,9 @@
       },
       "targets": [
         {
-          "alias": "$tag_environment - $tag_app - $tag_service - $tag_host",
+          "alias": "$tag_environment - $tag_app - $tag_service - $tag_host_name",
           "hide": false,
-          "query": "SELECT (MAX(\"milli_cpu_usage\") / 1000) / (MAX(\"memory_limit_mb\") / 4096)\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"environment\" =~ /^$environment$/\nAND \"app\" =~ /^$app$/\nAND \"service\" =~ /^$service$/\nAND \"host\" =~ /^$host$/\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host\"\n        fill(null)",
+          "query": "SELECT (MAX(\"milli_cpu_usage\") / 1000) / (MAX(\"memory_limit_mb\") / 4096)\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"environment\" =~ /^$environment$/\nAND \"app\" =~ /^$app$/\nAND \"service\" =~ /^$service$/\nAND \"host_name\" =~ /^$host$/\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host_name\"\n        fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -454,14 +454,14 @@
           "type": "influxdb",
           "uid": "${datasource_uid}"
         },
-        "definition": "SELECT \"host\",last(\"memory_rss_mb\") FROM \"metrics\" WHERE environment =~ /^$environment$/ AND app =~ /^$app$/ AND service =~ /^$service$/ AND $timeFilter GROUP BY \"host\"",
+        "definition": "SELECT \"host_name\",last(\"memory_rss_mb\") FROM \"metrics\" WHERE environment =~ /^$environment$/ AND app =~ /^$app$/ AND service =~ /^$service$/ AND $timeFilter GROUP BY \"host_name\"",
         "hide": 0,
         "includeAll": true,
         "label": "Container",
         "multi": false,
         "name": "host",
         "options": [],
-        "query": "SELECT \"host\",last(\"memory_rss_mb\") FROM \"metrics\" WHERE environment =~ /^$environment$/ AND app =~ /^$app$/ AND service =~ /^$service$/ AND $timeFilter GROUP BY \"host\"",
+        "query": "SELECT \"host_name\",last(\"memory_rss_mb\") FROM \"metrics\" WHERE environment =~ /^$environment$/ AND app =~ /^$app$/ AND service =~ /^$service$/ AND $timeFilter GROUP BY \"host_name\"",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
