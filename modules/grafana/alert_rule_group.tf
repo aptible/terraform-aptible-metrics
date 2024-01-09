@@ -26,14 +26,14 @@ resource "grafana_rule_group" "aptible_generated" {
       }
       model = <<-EOT
       {
-        "alias": "$tag_environment - $tag_app - $tag_service - $tag_host",
+        "alias": "$tag_environment - $tag_app - $tag_service - $tag_host_name",
         "hide": false,
         "intervalMs": 1000,
         "limit": "",
         "maxDataPoints": 43200,
         "measurement": "",
         "policy": "",
-        "query": "SELECT (MAX(\"milli_cpu_usage\") / 1000) / (MAX(\"milli_cpu_limit\") / 1000)\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"app\" != \"\"\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host\"",
+        "query": "SELECT (MAX(\"milli_cpu_usage\") / 1000) / (MAX(\"milli_cpu_limit\") / 1000)\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"app\" != \"\"\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host_name\"",
         "rawQuery": true,
         "resultFormat": "time_series",
         "slimit": "",
@@ -103,14 +103,14 @@ resource "grafana_rule_group" "aptible_generated" {
       }
       model = <<-EOT
       {
-        "alias": "$tag_environment - $tag_app - $tag_service - $tag_host",
+        "alias": "$tag_environment - $tag_app - $tag_service - $tag_host_name",
         "hide": false,
         "intervalMs": 1000,
         "limit": "",
         "maxDataPoints": 43200,
         "measurement": "",
         "policy": "",
-        "query": "SELECT MAX(\"memory_rss_mb\") / MAX(\"memory_limit_mb\")\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"app\" != \"\"\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host\"",
+        "query": "SELECT MAX(\"memory_rss_mb\") / MAX(\"memory_limit_mb\")\nFROM \"metrics\"\nWHERE $timeFilter\nAND \"app\" != \"\"\nGROUP BY\n        time($__interval),\n        \"environment\", \"app\", \"service\", \"host_name\"",
         "rawQuery": true,
         "resultFormat": "time_series",
         "slimit": "",
