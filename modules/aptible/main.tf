@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aptible = {
       source  = "aptible/aptible"
-      version = "~> 0.8.1"
+      version = "~> 0.10.0"
     }
     grafana = {
       source  = "grafana/grafana"
@@ -90,14 +90,12 @@ resource "random_password" "gf_secret_key" {
 # Some providers exist to create database objects but we don't have a way to set
 # up the tunnel in order to reach the database so use an Aptible App
 resource "aptible_app" "psql" {
-  env_id = data.aptible_environment.metrics.env_id
-  handle = "psql-${data.aptible_environment.metrics.handle}"
+  env_id       = data.aptible_environment.metrics.env_id
+  handle       = "psql-${data.aptible_environment.metrics.handle}"
+  docker_image = "postgres:alpine"
   service {
     process_type    = "cmd"
     container_count = 0
-  }
-  config = {
-    "APTIBLE_DOCKER_IMAGE" = "postgres:alpine"
   }
 }
 
@@ -156,8 +154,9 @@ resource "aptible_metric_drain" "this" {
 
 # Apps
 resource "aptible_app" "grafana" {
-  env_id = data.aptible_environment.metrics.env_id
-  handle = var.grafana_handle
+  env_id       = data.aptible_environment.metrics.env_id
+  handle       = var.grafana_handle
+  docker_image = "grafana/grafana:${var.grafana_image_tag}"
   service {
     process_type           = "cmd"
     container_count        = var.grafana_container_count
@@ -165,8 +164,6 @@ resource "aptible_app" "grafana" {
     container_profile      = var.grafana_container_profile
   }
   config = {
-    "APTIBLE_DOCKER_IMAGE"       = "grafana/grafana:${var.grafana_image_tag}"
-    "FORCE_SSL"                  = "true"
     "GF_SECURITY_ADMIN_PASSWORD" = random_password.gf_admin_password.result
     "GF_SECURITY_SECRET_KEY"     = random_password.gf_secret_key.result
     "GF_DEFAULT_INSTANCE_NAME"   = "aptible"
@@ -194,6 +191,7 @@ resource "aptible_endpoint" "grafana_endpoint" {
   endpoint_type  = "https"
   managed        = var.grafana_endpoint_domain != null
   platform       = "alb"
+  force_ssl      = true
 }
 
 # Grafana data source
