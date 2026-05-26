@@ -207,6 +207,41 @@ provider "grafana" {
   auth = local.grafana_auth
 }
 
+resource "null_resource" "grafana_ready" {
+  triggers = {
+    app_id                   = aptible_app.grafana.app_id
+    endpoint_virtual_domain  = aptible_endpoint.grafana_endpoint.virtual_domain
+    grafana_image_tag        = var.grafana_image_tag
+    grafana_auth_fingerprint = nonsensitive(sha256(local.grafana_auth))
+  }
+
+  provisioner "local-exec" {
+    environment = {
+      GRAFANA_AUTH = local.grafana_auth
+      GRAFANA_URL  = local.grafana_url
+    }
+
+    command = <<-EOT
+      set -eu
+
+      max_attempts=60
+      sleep_seconds=10
+
+      for attempt in $(seq 1 "$max_attempts"); do
+        if curl --fail --silent --show-error --user "$GRAFANA_AUTH" "$GRAFANA_URL/api/health" >/dev/null; then
+          exit 0
+        fi
+
+        echo "Waiting for Grafana API at $GRAFANA_URL to become ready ($attempt/$max_attempts)."
+        sleep "$sleep_seconds"
+      done
+
+      echo "Grafana API at $GRAFANA_URL did not become ready after $max_attempts attempts." >&2
+      exit 1
+    EOT
+  }
+}
+
 resource "grafana_data_source" "influx" {
   name          = "aptible-influx"
   type          = "influxdb"
@@ -216,4 +251,7 @@ resource "grafana_data_source" "influx" {
   secure_json_data_encoded = jsonencode({
     password = module.influx_url.password
   })
+
+  # The provider can connect before Grafana has finished initializing.
+  depends_on = [null_resource.grafana_ready]
 }

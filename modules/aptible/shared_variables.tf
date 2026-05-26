@@ -34,7 +34,7 @@ variable "grafana_db_user" {
 variable "grafana_image_tag" {
   description = "The grafana/grafana image tag (i.e. version) that the app will use."
   type        = string
-  default     = "latest"
+  default     = "9.5.20"
   nullable    = false
 }
 
