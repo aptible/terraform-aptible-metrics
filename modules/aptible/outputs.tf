@@ -16,12 +16,15 @@ output "grafana_endpoint" {
 output "grafana_url" {
   description = "The Grafana App's public URL."
   value       = local.grafana_url
+  # Downstream Grafana resources use this output to configure their provider.
+  depends_on = [null_resource.grafana_ready]
 }
 
 output "grafana_auth" {
   description = "An auth string that can be used to access Grafana."
   value       = local.grafana_auth
   sensitive   = true
+  depends_on  = [null_resource.grafana_ready]
 }
 
 output "grafana_db_user" {
