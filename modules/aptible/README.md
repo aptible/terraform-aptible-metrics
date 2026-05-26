@@ -14,7 +14,7 @@ PostgreSQL Database to manage Grafana sessions.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_aptible"></a> [aptible](#requirement\_aptible) | ~> 0.5.1 |
+| <a name="requirement_aptible"></a> [aptible](#requirement\_aptible) | ~> 0.8.1 |
 | <a name="requirement_grafana"></a> [grafana](#requirement\_grafana) | ~> 1.29.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | ~> 3.1.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.4.0 |
@@ -23,7 +23,7 @@ PostgreSQL Database to manage Grafana sessions.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aptible"></a> [aptible](#provider\_aptible) | ~> 0.5.1 |
+| <a name="provider_aptible"></a> [aptible](#provider\_aptible) | ~> 0.8.1 |
 | <a name="provider_grafana"></a> [grafana](#provider\_grafana) | ~> 1.29.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | ~> 3.1.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | ~> 3.4.0 |
@@ -46,6 +46,7 @@ PostgreSQL Database to manage Grafana sessions.
 | [aptible_endpoint.grafana_endpoint](https://registry.terraform.io/providers/aptible/aptible/latest/docs/resources/endpoint) | resource |
 | [aptible_metric_drain.this](https://registry.terraform.io/providers/aptible/aptible/latest/docs/resources/metric_drain) | resource |
 | [grafana_data_source.influx](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/data_source) | resource |
+| [null_resource.grafana_ready](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.sessions_table](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_password.gf_admin_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [random_password.gf_db_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
@@ -65,7 +66,7 @@ PostgreSQL Database to manage Grafana sessions.
 | <a name="input_grafana_db_user"></a> [grafana\_db\_user](#input\_grafana\_db\_user) | The user that Grafana will use to access the PostgreSQL Database. This user is created and granted the necessary permissions on the Database. | `string` | `"grafana"` | no |
 | <a name="input_grafana_endpoint_domain"></a> [grafana\_endpoint\_domain](#input\_grafana\_endpoint\_domain) | The custom domain for the Grafana Endpoint to use. By default the App's default domain will be used. Wildcard domains are not supported. | `string` | `null` | no |
 | <a name="input_grafana_handle"></a> [grafana\_handle](#input\_grafana\_handle) | The handle to use for the Grafana App. | `string` | `"grafana"` | no |
-| <a name="input_grafana_image_tag"></a> [grafana\_image\_tag](#input\_grafana\_image\_tag) | The grafana/grafana image tag (i.e. version) that the app will use. | `string` | `"latest"` | no |
+| <a name="input_grafana_image_tag"></a> [grafana\_image\_tag](#input\_grafana\_image\_tag) | The grafana/grafana image tag (i.e. version) that the app will use. | `string` | `"9.5.20"` | no |
 | <a name="input_influx_container_profile"></a> [influx\_container\_profile](#input\_influx\_container\_profile) | The instance profile of the InfluxDB metrics Database container. | `string` | `null` | no |
 | <a name="input_influx_container_size"></a> [influx\_container\_size](#input\_influx\_container\_size) | The size (in MB) of the InfluxDB metrics Database container. | `number` | `null` | no |
 | <a name="input_influx_handle"></a> [influx\_handle](#input\_influx\_handle) | The handle to use for the InfluxDB Database used to store metrics. | `string` | `"influx"` | no |
