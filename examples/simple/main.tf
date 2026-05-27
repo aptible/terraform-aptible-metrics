@@ -4,3 +4,13 @@ module "aptible_metrics" {
   source              = "../../"
   metrics_environment = "my-env"
 }
+
+output "grafana_url" {
+  value     = module.aptible_metrics.aptible.grafana_url
+  sensitive = true
+}
+
+output "grafana_auth" {
+  value     = module.aptible_metrics.aptible.grafana_auth
+  sensitive = true
+}

@@ -5,3 +5,13 @@ module "aptible_metrics" {
   metrics_environment = "my-metrics"
   drain_environments  = ["my-metrics", "my-env", "my-other-env"]
 }
+
+output "grafana_url" {
+  value     = module.aptible_metrics.aptible.grafana_url
+  sensitive = true
+}
+
+output "grafana_auth" {
+  value     = module.aptible_metrics.aptible.grafana_auth
+  sensitive = true
+}

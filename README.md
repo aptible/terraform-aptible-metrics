@@ -9,6 +9,8 @@ includes two submodules for managing resources:
 This module is responsible for managing the Aptible resources (and the Grafana
 data source) necessary to collect and store container metrics.
 
+See the `examples` directory for recommended usages of this module. 
+
 ### Dependencies
 
 This module depends on the 
