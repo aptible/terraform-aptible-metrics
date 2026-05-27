@@ -14,7 +14,7 @@ PostgreSQL Database to manage Grafana sessions.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_aptible"></a> [aptible](#requirement\_aptible) | ~> 0.8.1 |
+| <a name="requirement_aptible"></a> [aptible](#requirement\_aptible) | ~> 0.10.0 |
 | <a name="requirement_grafana"></a> [grafana](#requirement\_grafana) | ~> 1.29.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | ~> 3.1.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.4.0 |
@@ -23,7 +23,7 @@ PostgreSQL Database to manage Grafana sessions.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aptible"></a> [aptible](#provider\_aptible) | ~> 0.8.1 |
+| <a name="provider_aptible"></a> [aptible](#provider\_aptible) | ~> 0.10.0 |
 | <a name="provider_grafana"></a> [grafana](#provider\_grafana) | ~> 1.29.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | ~> 3.1.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | ~> 3.4.0 |
