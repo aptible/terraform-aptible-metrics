@@ -246,6 +246,10 @@ resource "grafana_data_source" "influx" {
   url           = local.influx_database_url
   database_name = local.influx_database_name
   username      = module.influx_url.user
+  json_data_encoded = jsonencode({
+    version  = "InfluxQL"
+    httpMode = "GET"
+  })
   secure_json_data_encoded = jsonencode({
     password = module.influx_url.password
   })
